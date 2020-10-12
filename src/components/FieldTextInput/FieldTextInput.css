@@ -15,5 +15,10 @@
   border-bottom-color: var(--failColor);
 }
 
+.input:disabled {
+  border-bottom-color: var(--matterColorAnti);
+  color: var(--matterColorAnti);
+}
+
 .textarea {
 }

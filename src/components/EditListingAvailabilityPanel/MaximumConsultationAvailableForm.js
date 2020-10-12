@@ -45,6 +45,14 @@ const prepareData = (formValues) => {
 
 const getCheckboxId = (type) => `${type}.isEnabled`;
 
+const getEnabledCheckboxes = (data) => Object.entries(data).reduce((result, [key, value]) => {
+  if (value) {
+    return [...result, getCheckboxId(key)];
+  }
+
+  return result;
+}, []);;
+
 const getInitialFormValues = (data) => {
   if (
     data === undefined
@@ -54,16 +62,9 @@ const getInitialFormValues = (data) => {
       [FormValues.MaxConsultations]: EnumMaximumConsultationsType.unlimited,
     };
   } else {
-    const enabledFields = Object.entries(data).reduce((result, [key, value]) => {
-      if (value) {
-        return [...result, getCheckboxId(key)];
-      }
-
-      return result;
-    }, []);
     return {
       [FormValues.MaxConsultations]: EnumMaximumConsultationsType.limited,
-      [FormValues.LimitTypes]: enabledFields,
+      [FormValues.LimitTypes]: getEnabledCheckboxes(data),
       [FormValues.Limitations]: data,
     }
   }
@@ -71,6 +72,11 @@ const getInitialFormValues = (data) => {
 
 const MaximumConsultationAvailableForm = ({ onSubmit, savedData }) => {
   const prevTypeValue = React.useRef(EnumMaximumConsultationsType.unlimited);
+  const [initialValues, setInitialValues] = React.useState(false);
+
+  React.useEffect(() => {
+    setInitialValues(getInitialFormValues(savedData));
+  }, []);
 
   const handle = (param) => {
     onSubmit({
@@ -81,7 +87,7 @@ const MaximumConsultationAvailableForm = ({ onSubmit, savedData }) => {
   return (
     <FinalForm
       onSubmit={handle}
-      initialValues={getInitialFormValues(savedData)}
+      initialValues={initialValues}
       render={fieldRenderProps => {
         const {
           handleSubmit,
@@ -97,7 +103,11 @@ const MaximumConsultationAvailableForm = ({ onSubmit, savedData }) => {
             prevTypeValue.current = event.values[FormValues.MaxConsultations];
 
             if (currentMaxConsultations === EnumMaximumConsultationsType.unlimited) {
-              form.change('Limitations', undefined);
+              form.change(FormValues.LimitTypes, undefined);
+              form.change(FormValues.Limitations, undefined);
+            } else {
+              form.change(FormValues.LimitTypes, getEnabledCheckboxes(savedData));
+              form.change(FormValues.Limitations, savedData);
             }
           }
         };
