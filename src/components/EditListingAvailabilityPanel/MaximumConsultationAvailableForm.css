@@ -1,0 +1,30 @@
+@import '../../marketplace.css';
+
+.panel {
+  padding: calc(2 * var(--spacingUnit));
+
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  @media (--viewportMedium) {
+    padding: calc(2 * var(--spacingUnitDesktop) - 2px) calc(2 * var(--spacingUnitDesktop));
+  }
+}
+
+.formRow {
+  /* This container uses flexbox layout */
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  /* parent aka root is flexbox, this container takes all available space */
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+
+  @media (--viewportSmall) {
+    flex-wrap: nowrap;
+  }
+}

@@ -18,6 +18,7 @@ import {
 import { EditListingAvailabilityPlanForm, EditListingAvailabilityExceptionForm } from '../../forms';
 
 import css from './EditListingAvailabilityPanel.css';
+import MaximumConsultationAvailableForm from './MaximumConsultationAvailableForm';
 
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -125,6 +126,13 @@ const createAvailabilityPlan = values => ({
   },
 });
 
+// Create availabilityPlan from submit values
+const createLimitations = values => ({
+  privateData: {
+    bookingLimitations: values,
+  }
+});
+
 // Ensure that the AvailabilityExceptions are in sensible order.
 //
 // Note: if you allow fetching more than 100 exception,
@@ -186,6 +194,17 @@ const EditListingAvailabilityPanel = props => {
 
     // Final Form can wait for Promises to return.
     return onSubmit(createAvailabilityPlan(values))
+      .then(() => {
+        setIsEditPlanModalOpen(false);
+      })
+      .catch(e => {
+        // Don't close modal if there was an error
+      });
+  };
+
+  const handleLimitationsSubmit = values => {
+    // Final Form can wait for Promises to return.
+    return onSubmit(createLimitations(values))
       .then(() => {
         setIsEditPlanModalOpen(false);
       })
@@ -334,6 +353,19 @@ const EditListingAvailabilityPanel = props => {
             <FormattedMessage id="EditListingAvailabilityPanel.addException" />
           </InlineTextButton>
         ) : null}
+      </section>
+
+      <section className={css.section}>
+        <header className={css.sectionHeader}>
+          <h2 className={css.sectionTitle}>
+            Maximum consultations available
+            {/*todo: translate*/}
+          </h2>
+        </header>
+        <MaximumConsultationAvailableForm
+          onSubmit={handleLimitationsSubmit}
+          savedData={currentListing.attributes.privateData.bookingLimitations}
+        />
       </section>
 
       {errors.showListingsError ? (
