@@ -1,6 +1,6 @@
 import { Form as FinalForm, FormSpy } from 'react-final-form';
 import FieldRadioButton from '../FieldRadioButton/FieldRadioButton';
-import { Button } from '../index';
+import { Button, PrimaryButton } from '../index';
 import React from 'react';
 import FieldCheckbox from '../FieldCheckbox/FieldCheckbox';
 
@@ -43,7 +43,7 @@ const prepareData = (formValues) => {
   }
 };
 
-const getCheckboxId = (type) => `${type}.isEnabled`;
+const getCheckboxId = (type) => `${type}`;
 
 const getEnabledCheckboxes = (data) => {
   if (!data) {
@@ -76,12 +76,13 @@ const getInitialFormValues = (data) => {
   }
 };
 
-const MaximumConsultationAvailableForm = ({ onSubmit, savedData }) => {
+const MaximumConsultationAvailableForm = ({ onSubmit, savedData, inProgress }) => {
   const prevTypeValue = React.useRef(EnumMaximumConsultationsType.unlimited);
-  const [initialValues, setInitialValues] = React.useState(false);
+  const prevCheckboxes = React.useRef([]);
+  const [initialFormValues, setInitialFormValues] = React.useState({});
 
   React.useEffect(() => {
-    setInitialValues(getInitialFormValues(savedData));
+    setInitialFormValues(getInitialFormValues(savedData));
   }, []);
 
   const handle = (param) => {
@@ -93,28 +94,47 @@ const MaximumConsultationAvailableForm = ({ onSubmit, savedData }) => {
   return (
     <FinalForm
       onSubmit={handle}
-      initialValues={initialValues}
+      initialValues={initialFormValues}
       render={fieldRenderProps => {
         const {
+          initialValues,
           handleSubmit,
           values,
           form,
         } = fieldRenderProps;
 
         const onChange = (event) => {
-          const currentMaxConsultations = event.values[FormValues.MaxConsultations];
+          const { MaxConsultations, LimitTypes } = event.values;
           if (
-            currentMaxConsultations !== prevTypeValue.current
+            MaxConsultations !== prevTypeValue.current
           ) {
-            prevTypeValue.current = event.values[FormValues.MaxConsultations];
+            prevTypeValue.current = MaxConsultations;
 
-            if (currentMaxConsultations === EnumMaximumConsultationsType.unlimited) {
+            if (MaxConsultations === EnumMaximumConsultationsType.unlimited) {
               form.change(FormValues.LimitTypes, undefined);
               form.change(FormValues.Limitations, undefined);
             } else {
               form.change(FormValues.LimitTypes, getEnabledCheckboxes(savedData));
               form.change(FormValues.Limitations, savedData);
             }
+          }
+
+          if (
+            LimitTypes
+            && prevCheckboxes.current.length !== LimitTypes.length
+          ) {
+            prevCheckboxes.current = LimitTypes;
+            Object.keys(EnumMaxNumberType).forEach(key => {
+              if (!LimitTypes.includes(key)) {
+                form.change(`${FormValues.Limitations}.${key}`, undefined);
+              } else {
+                const initialLimitation = initialValues
+                  && initialValues[FormValues.Limitations]
+                  && initialValues[FormValues.Limitations][key];
+
+                form.change(`${FormValues.Limitations}.${key}`, initialLimitation);
+              }
+            });
           }
         };
 
@@ -193,7 +213,7 @@ const MaximumConsultationAvailableForm = ({ onSubmit, savedData }) => {
               </div>
             </div>
 
-            <Button style={{ marginTop: 24 }} type="submit" disabled={false}>
+            <Button style={{ marginTop: 24 }} type="submit" disabled={inProgress}>
               Save limitations
             </Button>
           </form>

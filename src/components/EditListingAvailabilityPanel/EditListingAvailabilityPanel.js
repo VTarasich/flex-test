@@ -364,6 +364,7 @@ const EditListingAvailabilityPanel = props => {
         </header>
         <MaximumConsultationAvailableForm
           onSubmit={handleLimitationsSubmit}
+          inProgress={updateInProgress}
           savedData={currentListing.attributes.publicData.bookingLimitations}
         />
       </section>
