@@ -451,7 +451,7 @@ export function requestUpdateListing(tab, data) {
     dispatch(updateListing(data));
     const { id } = data;
     let updateResponse;
-    
+
     return sdk.ownListings
       .update(data)
       .then(response => {

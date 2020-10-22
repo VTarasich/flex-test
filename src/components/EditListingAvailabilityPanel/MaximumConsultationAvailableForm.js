@@ -104,7 +104,7 @@ const MaximumConsultationAvailableForm = ({ onSubmit, savedData, inProgress }) =
         } = fieldRenderProps;
 
         const onChange = (event) => {
-          const { MaxConsultations, LimitTypes } = event.values;
+          const { MaxConsultations, LimitTypes, Limitations } = event.values;
           if (
             MaxConsultations !== prevTypeValue.current
           ) {
@@ -128,9 +128,11 @@ const MaximumConsultationAvailableForm = ({ onSubmit, savedData, inProgress }) =
               if (!LimitTypes.includes(key)) {
                 form.change(`${FormValues.Limitations}.${key}`, undefined);
               } else {
-                const initialLimitation = initialValues
-                  && initialValues[FormValues.Limitations]
-                  && initialValues[FormValues.Limitations][key];
+                const initialLimitation = Limitations && Limitations[key]
+                  ? Limitations[key]
+                  : initialValues
+                    && initialValues[FormValues.Limitations]
+                    && initialValues[FormValues.Limitations][key];
 
                 form.change(`${FormValues.Limitations}.${key}`, initialLimitation);
               }
