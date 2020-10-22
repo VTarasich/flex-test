@@ -32,6 +32,7 @@ const sharetribeSdk = require('sharetribe-flex-sdk');
 const sitemap = require('express-sitemap');
 const auth = require('./auth');
 const apiRouter = require('./apiRouter');
+const hubliveRouter = require('./hubliveRouter');
 const renderer = require('./renderer');
 const dataLoader = require('./dataLoader');
 const fs = require('fs');
@@ -147,6 +148,7 @@ if (!dev) {
 
 // Server-side routes that do not render the application
 app.use('/api', apiRouter);
+app.use('/api-hublive', hubliveRouter);
 
 const noCacheHeaders = {
   'Cache-control': 'no-cache, no-store, must-revalidate',
