@@ -120,42 +120,43 @@ export const searchMapListingsError = e => ({
 });
 
 export const searchListings = searchParams => (dispatch) => {
-  dispatch(searchListingsRequest(searchParams));
+  try {
+    dispatch(searchListingsRequest(searchParams));
 
-  const priceSearchParams = priceParam => {
-    const inSubunits = value =>
-      convertUnitToSubUnit(value, unitDivisor(config.currencyConfig.currency));
-    const values = priceParam ? priceParam.split(',') : [];
-    return priceParam && values.length === 2
-      ? {
+    const priceSearchParams = priceParam => {
+      const inSubunits = value =>
+        convertUnitToSubUnit(value, unitDivisor(config.currencyConfig.currency));
+      const values = priceParam ? priceParam.split(',') : [];
+      return priceParam && values.length === 2
+        ? {
           price: [inSubunits(values[0]), inSubunits(values[1]) + 1].join(','),
         }
-      : {};
-  };
-
-  const availabilityParams = (datesParam, minDurationParam) => {
-    const dateValues = datesParam ? datesParam.split(',') : [];
-    const hasDateValues = datesParam && dateValues.length === 2;
-    const startDate = hasDateValues ? dateValues[0] : null;
-    const endDate = hasDateValues ? dateValues[1] : null;
-
-    const minDurationMaybe =
-      minDurationParam && Number.isInteger(minDurationParam) && hasDateValues
-        ? { minDuration: minDurationParam }
         : {};
+    };
 
-    // Find configs for 'dates-length' filter
-    // (type: BookingDateRangeLengthFilter)
-    const filterConfigs = config.custom.filters;
-    const idOfBookingDateRangeLengthFilter = 'dates-length';
-    const dateLengthFilterConfig = filterConfigs.find(
-      f => f.id === idOfBookingDateRangeLengthFilter
-    );
-    // Extract time zone
-    const timeZone = dateLengthFilterConfig.config.searchTimeZone;
+    const availabilityParams = (datesParam, minDurationParam) => {
+      const dateValues = datesParam ? datesParam.split(',') : [];
+      const hasDateValues = datesParam && dateValues.length === 2;
+      const startDate = hasDateValues ? dateValues[0] : null;
+      const endDate = hasDateValues ? dateValues[1] : null;
 
-    return hasDateValues
-      ? {
+      const minDurationMaybe =
+        minDurationParam && Number.isInteger(minDurationParam) && hasDateValues
+          ? { minDuration: minDurationParam }
+          : {};
+
+      // Find configs for 'dates-length' filter
+      // (type: BookingDateRangeLengthFilter)
+      const filterConfigs = config.custom.filters;
+      const idOfBookingDateRangeLengthFilter = 'dates-length';
+      const dateLengthFilterConfig = filterConfigs.find(
+        f => f.id === idOfBookingDateRangeLengthFilter
+      );
+      // Extract time zone
+      const timeZone = dateLengthFilterConfig.config.searchTimeZone;
+
+      return hasDateValues
+        ? {
           start: formatDateStringToTz(startDate, timeZone),
           end: getExclusiveEndDateWithTz(endDate, timeZone),
 
@@ -169,31 +170,35 @@ export const searchListings = searchParams => (dispatch) => {
 
           ...minDurationMaybe,
         }
-      : {};
-  };
+        : {};
+    };
 
-  const { perPage, price, dates, minDuration, ...rest } = searchParams;
-  const priceMaybe = priceSearchParams(price);
-  const availabilityMaybe = availabilityParams(dates, minDuration);
+    const { perPage, price, dates, minDuration, ...rest } = searchParams;
+    const priceMaybe = priceSearchParams(price);
+    const availabilityMaybe = availabilityParams(dates, minDuration);
 
-  const params = {
-    ...rest,
-    ...priceMaybe,
-    ...availabilityMaybe,
-    per_page: perPage,
-  };
+    const params = {
+      ...rest,
+      ...priceMaybe,
+      ...availabilityMaybe,
+      per_page: perPage,
+    };
 
-  return testHubliveApi(params)
-    .then(response => {
-      dispatch(addMarketplaceEntities(response));
-      dispatch(searchListingsSuccess(response));
+    return testHubliveApi(params)
+      .then(response => {
+        dispatch(addMarketplaceEntities(response));
+        dispatch(searchListingsSuccess(response));
 
-      return response;
-    })
-    .catch(e => {
-      dispatch(searchListingsError(storableError(e)));
-      throw e;
-    });
+        return response;
+      })
+      .catch(e => {
+        dispatch(searchListingsError(storableError(e)));
+        throw e;
+      });
+  } catch (e) {
+    console.error('Error', e);
+  }
+
 };
 
 export const setActiveListing = listingId => ({
