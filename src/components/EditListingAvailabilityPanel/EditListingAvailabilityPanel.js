@@ -128,7 +128,7 @@ const createAvailabilityPlan = values => ({
 
 // Create availabilityPlan from submit values
 const createLimitations = values => ({
-  privateData: {
+  publicData: {
     bookingLimitations: values,
   }
 });
@@ -364,7 +364,7 @@ const EditListingAvailabilityPanel = props => {
         </header>
         <MaximumConsultationAvailableForm
           onSubmit={handleLimitationsSubmit}
-          savedData={currentListing.attributes.privateData.bookingLimitations}
+          savedData={currentListing.attributes.publicData.bookingLimitations}
         />
       </section>
 

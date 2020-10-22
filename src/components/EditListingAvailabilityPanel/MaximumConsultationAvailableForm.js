@@ -45,13 +45,19 @@ const prepareData = (formValues) => {
 
 const getCheckboxId = (type) => `${type}.isEnabled`;
 
-const getEnabledCheckboxes = (data) => Object.entries(data).reduce((result, [key, value]) => {
-  if (value) {
-    return [...result, getCheckboxId(key)];
+const getEnabledCheckboxes = (data) => {
+  if (!data) {
+    return [];
   }
 
-  return result;
-}, []);;
+  return Object.entries(data).reduce((result, [key, value]) => {
+    if (value) {
+      return [...result, getCheckboxId(key)];
+    }
+
+    return result;
+  }, []);
+};
 
 const getInitialFormValues = (data) => {
   if (
@@ -195,6 +201,6 @@ const MaximumConsultationAvailableForm = ({ onSubmit, savedData }) => {
       }}
     />
   );
-}
+};
 
 export default MaximumConsultationAvailableForm;

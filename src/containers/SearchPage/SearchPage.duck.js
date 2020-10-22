@@ -4,6 +4,7 @@ import { addMarketplaceEntities } from '../../ducks/marketplaceData.duck';
 import { convertUnitToSubUnit, unitDivisor } from '../../util/currency';
 import { formatDateStringToTz, getExclusiveEndDateWithTz } from '../../util/dates';
 import config from '../../config';
+import { testHubliveApi } from '../../util/api';
 
 // ================ Action types ================ //
 
@@ -118,7 +119,7 @@ export const searchMapListingsError = e => ({
   payload: e,
 });
 
-export const searchListings = searchParams => (dispatch, getState, sdk) => {
+export const searchListings = searchParams => (dispatch) => {
   dispatch(searchListingsRequest(searchParams));
 
   const priceSearchParams = priceParam => {
@@ -182,11 +183,11 @@ export const searchListings = searchParams => (dispatch, getState, sdk) => {
     per_page: perPage,
   };
 
-  return sdk.listings
-    .query(params)
+  return testHubliveApi(params)
     .then(response => {
       dispatch(addMarketplaceEntities(response));
       dispatch(searchListingsSuccess(response));
+
       return response;
     })
     .catch(e => {

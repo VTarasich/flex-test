@@ -6,9 +6,9 @@ require('./env').configureEnv();
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const apiRouter = require('./apiRouter');
+const hubliveRouter = require('./hubliveRouter');
 
 const radix = 10;
 const PORT = parseInt(process.env.REACT_APP_DEV_API_SERVER_PORT, radix);
@@ -24,6 +24,7 @@ app.use(
 );
 app.use(cookieParser());
 app.use('/api', apiRouter);
+app.use('/api-hublive', hubliveRouter);
 
 app.listen(PORT, () => {
   console.log(`API server listening on ${PORT}`);

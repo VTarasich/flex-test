@@ -99,3 +99,7 @@ export const initiatePrivileged = body => {
 export const transitionPrivileged = body => {
   return post('/api/transition-privileged', body);
 };
+
+export const testHubliveApi = body => {
+  return post('/api-hublive/listings-filtered', body);
+};
